@@ -82,21 +82,22 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
         type: 'scroll' as const,
         orient: 'vertical' as const,
         right: 0,
-        top: 10,
-        bottom: 10,
-        width: 200,
-        textStyle: { fontSize: 10 },
+        top: 'middle' as const,
+        width: 180,
+        textStyle: { fontSize: 11, overflow: 'breakAll' as const },
         formatter: (name: string) => {
           const item = blockedData.find((d) => d.name === name);
           const pct = item ? item.percentage.toFixed(2) : '0.00';
-          const short = name.length > 24 ? name.substring(0, 24) + '…' : name;
-          return `${short} ${pct}%`;
+          return `${name} ${pct}%`;
         },
+        itemWidth: 12,
+        itemHeight: 12,
+        itemGap: 8,
       },
       series: [{
         type: 'pie',
-        radius: ['0%', '70%'],
-        center: ['35%', '50%'],
+        radius: ['0%', '65%'],
+        center: ['30%', '50%'],
         data: blockedData.map((d) => ({
           name: d.name,
           value: d.value,
@@ -110,6 +111,56 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
     };
   }, [blockedData]);
 
+  /** Render a YouTube consumption table */
+  const renderYoutubeTable = (
+    data: Record<string, unknown>[] | null,
+    maxVal: number,
+    barColor: string,
+    fallbackFile: string,
+  ) => {
+    if (!data || data.length === 0) {
+      return <FallbackMessage title="Datos no disponibles" message={fallbackFile} />;
+    }
+    return (
+      <div style={{ maxHeight: 440, overflowY: 'auto' }}>
+        <table className="data-table swg-table">
+          <thead>
+            <tr>
+              <th style={{ width: 28 }}>#</th>
+              <th>User</th>
+              <th>Application</th>
+              <th style={{ textAlign: 'right', minWidth: 180 }}>Sum - Total Bytes (MB)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, idx) => {
+              const val = row._value as number;
+              const pct = Math.min((val / maxVal) * 100, 100);
+              return (
+                <tr key={idx}>
+                  <td>{row._index as number}</td>
+                  <td style={{ fontSize: '0.72rem' }}>{String(row.User ?? '')}</td>
+                  <td>{String(row.Application ?? '')}</td>
+                  <td className="num">
+                    <div className="swg-bar-cell">
+                      <span className="swg-bar-value">{fmtMB(val)} MB</span>
+                      <div className="swg-bar-track">
+                        <div
+                          className="swg-bar-fill"
+                          style={{ width: `${pct}%`, background: barColor }}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <div id="dashboard-swg-summary">
       <div className="export-container">
@@ -119,94 +170,18 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
       <div className="swg-summary-layout">
         {/* ── Card 1: On-Premise ── */}
         <DashboardCard title="YouTube Consumption On-Premise">
-          {onPremData && onPremData.length > 0 ? (
-            <div style={{ maxHeight: 420, overflowY: 'auto' }}>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: 30 }}>#</th>
-                    <th>User</th>
-                    <th>Application</th>
-                    <th style={{ textAlign: 'right' }}>Sum - Total Bytes (MB)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {onPremData.map((row, idx) => {
-                    const val = row._value as number;
-                    const pct = Math.min((val / onPremMax) * 100, 100);
-                    return (
-                      <tr key={idx}>
-                        <td>{row._index as number}</td>
-                        <td>{String(row.User ?? '')}</td>
-                        <td>{String(row.Application ?? '')}</td>
-                        <td className="num">
-                          <div className="inline-bar-container">
-                            <div
-                              className="inline-bar"
-                              style={{ width: `${pct}%`, background: '#8BC34A', maxWidth: 100 }}
-                            />
-                            <span>{fmtMB(val)} MB</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <FallbackMessage title="Datos no disponibles" message="youtube_consumption_on-premise.csv" />
-          )}
+          {renderYoutubeTable(onPremData, onPremMax, '#8BC34A', 'youtube_consumption_on-premise.csv')}
         </DashboardCard>
 
         {/* ── Card 2: Off-Premise ── */}
         <DashboardCard title="YouTube Consumption Off-Premise">
-          {offPremData && offPremData.length > 0 ? (
-            <div style={{ maxHeight: 420, overflowY: 'auto' }}>
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: 30 }}>#</th>
-                    <th>User</th>
-                    <th>Application</th>
-                    <th style={{ textAlign: 'right' }}>Sum - Total Bytes (MB)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {offPremData.map((row, idx) => {
-                    const val = row._value as number;
-                    const pct = Math.min((val / offPremMax) * 100, 100);
-                    // Gradient: top value gets blue, lower values get green
-                    const barColor = idx === 0 ? '#2196F3' : '#8BC34A';
-                    return (
-                      <tr key={idx}>
-                        <td>{row._index as number}</td>
-                        <td>{String(row.User ?? '')}</td>
-                        <td>{String(row.Application ?? '')}</td>
-                        <td className="num">
-                          <div className="inline-bar-container">
-                            <div
-                              className="inline-bar"
-                              style={{ width: `${pct}%`, background: barColor, maxWidth: 100 }}
-                            />
-                            <span>{fmtMB(val)} MB</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <FallbackMessage title="Datos no disponibles" message="youtube_consumption_off-premise.csv" />
-          )}
+          {renderYoutubeTable(offPremData, offPremMax, '#2196F3', 'youtube_consumption_off-premise.csv')}
         </DashboardCard>
 
         {/* ── Card 3: Top Blocked Categories ── */}
         <DashboardCard title="Top Blocked Categories">
           {pieOption ? (
-            <ReactECharts option={pieOption} style={{ height: 380 }} notMerge={true} />
+            <ReactECharts option={pieOption} style={{ height: 420, minWidth: 0 }} notMerge={true} />
           ) : (
             <FallbackMessage title="Datos no disponibles" message="top_blocked_categories.csv" />
           )}
