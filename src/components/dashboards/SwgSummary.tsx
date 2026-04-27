@@ -81,23 +81,23 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
       legend: {
         type: 'scroll' as const,
         orient: 'vertical' as const,
-        right: 0,
+        right: '25%',
         top: 'middle' as const,
-        width: 180,
-        textStyle: { fontSize: 11, overflow: 'breakAll' as const },
+        textStyle: { fontSize: 12 },
         formatter: (name: string) => {
           const item = blockedData.find((d) => d.name === name);
           const pct = item ? item.percentage.toFixed(2) : '0.00';
-          return `${name} ${pct}%`;
+          const short = name.length > 30 ? name.substring(0, 30) + '…' : name;
+          return `${short}  ${pct}%`;
         },
-        itemWidth: 12,
-        itemHeight: 12,
-        itemGap: 8,
+        itemWidth: 14,
+        itemHeight: 14,
+        itemGap: 10,
       },
       series: [{
         type: 'pie',
-        radius: ['0%', '65%'],
-        center: ['30%', '50%'],
+        radius: ['0%', '75%'],
+        center: ['32%', '50%'],
         data: blockedData.map((d) => ({
           name: d.name,
           value: d.value,
@@ -111,11 +111,28 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
     };
   }, [blockedData]);
 
+  /** Bar color gradient based on ranking: top = dark blue, middle = teal, bottom = green */
+  const getBarColor = (idx: number, total: number): string => {
+    const colors = [
+      '#1a237e', // 1 - dark indigo
+      '#283593', // 2 - indigo
+      '#1565c0', // 3 - dark blue
+      '#1976d2', // 4 - blue
+      '#0288d1', // 5 - light blue
+      '#00838f', // 6 - teal
+      '#00897b', // 7 - dark teal
+      '#43a047', // 8 - green
+      '#7cb342', // 9 - light green
+      '#8bc34a', // 10 - lime
+      '#aed581', // 11 - light lime
+    ];
+    return colors[Math.min(idx, colors.length - 1)];
+  };
+
   /** Render a YouTube consumption table */
   const renderYoutubeTable = (
     data: Record<string, unknown>[] | null,
     maxVal: number,
-    barColor: string,
     fallbackFile: string,
   ) => {
     if (!data || data.length === 0) {
@@ -136,6 +153,7 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
             {data.map((row, idx) => {
               const val = row._value as number;
               const pct = Math.min((val / maxVal) * 100, 100);
+              const barColor = getBarColor(idx, data.length);
               return (
                 <tr key={idx}>
                   <td>{row._index as number}</td>
@@ -167,26 +185,25 @@ export const SwgSummary: React.FC<Props> = ({ resolved }) => {
         <ExportButton targetId="dashboard-swg-summary" filename="swg_summary" />
       </div>
 
-      <div className="swg-summary-layout">
-        {/* ── Card 1: On-Premise ── */}
+      {/* ── Row 1: Two YouTube tables side by side ── */}
+      <div className="grid-2" style={{ marginBottom: 'var(--space-xl)' }}>
         <DashboardCard title="YouTube Consumption On-Premise">
-          {renderYoutubeTable(onPremData, onPremMax, '#8BC34A', 'youtube_consumption_on-premise.csv')}
+          {renderYoutubeTable(onPremData, onPremMax, 'youtube_consumption_on-premise.csv')}
         </DashboardCard>
 
-        {/* ── Card 2: Off-Premise ── */}
         <DashboardCard title="YouTube Consumption Off-Premise">
-          {renderYoutubeTable(offPremData, offPremMax, '#2196F3', 'youtube_consumption_off-premise.csv')}
-        </DashboardCard>
-
-        {/* ── Card 3: Top Blocked Categories ── */}
-        <DashboardCard title="Top Blocked Categories">
-          {pieOption ? (
-            <ReactECharts option={pieOption} style={{ height: 420, minWidth: 0 }} notMerge={true} />
-          ) : (
-            <FallbackMessage title="Datos no disponibles" message="top_blocked_categories.csv" />
-          )}
+          {renderYoutubeTable(offPremData, offPremMax, 'youtube_consumption_off-premise.csv')}
         </DashboardCard>
       </div>
+
+      {/* ── Row 2: Top Blocked Categories full width ── */}
+      <DashboardCard title="Top Blocked Categories">
+        {pieOption ? (
+          <ReactECharts option={pieOption} style={{ height: 380 }} notMerge={true} />
+        ) : (
+          <FallbackMessage title="Datos no disponibles" message="top_blocked_categories.csv" />
+        )}
+      </DashboardCard>
     </div>
   );
 };
