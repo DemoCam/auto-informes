@@ -770,6 +770,16 @@ body {
   margin-bottom: var(--space-lg);
 }
 
+/* ─── SWG Summary Layout ─── */
+.swg-summary-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.badge-swg { background: #e0f2f1; color: #00695c; }
+
 /* ─── Responsive ─── */
 @media (max-width: 1200px) {
   .grid-3 { grid-template-columns: 1fr 1fr; }
@@ -778,6 +788,7 @@ body {
   .private-access-layout .policies-area { grid-column: 1; grid-row: 2; }
   .private-access-layout .kpi-area { grid-row: 3; }
   .private-access-layout .private-apps-area { grid-column: 1; grid-row: 4; }
+  .swg-summary-layout { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -787,4 +798,5 @@ body {
   .grid-2x4 { grid-template-columns: 1fr 1fr; }
   .main-content { padding: var(--space-lg); }
   .filters-bar { flex-direction: column; }
+  .swg-summary-layout { grid-template-columns: 1fr; }
 }

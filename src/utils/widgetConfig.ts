@@ -67,6 +67,13 @@ export const WIDGET_CONFIGS: Record<DashboardId, WidgetConfig[]> = {
     { id: 'data_centers', label: 'Data Centers', aggregation: 'snapshot' },
     { id: 'private_apps_pie', label: 'Top Private Apps by Bytes', aggregation: 'aggregated' },
   ],
+
+  // ─── SWG Summary ───
+  swg_summary_main: [
+    { id: 'yt_onpremise', label: 'YouTube Consumption On-Premise', aggregation: 'aggregated' },
+    { id: 'yt_offpremise', label: 'YouTube Consumption Off-Premise', aggregation: 'aggregated' },
+    { id: 'top_blocked', label: 'Top Blocked Categories', aggregation: 'aggregated' },
+  ],
 };
 
 /**

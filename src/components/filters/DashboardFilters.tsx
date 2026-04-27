@@ -56,6 +56,7 @@ export const DashboardFilters: React.FC = () => {
     mapa: 'Mapa',
     ia_en_riesgos: 'IA',
     proteccion_datos_personales: 'Protección',
+    swg_summary: 'SWG Summary',
   };
 
   return (
@@ -70,6 +71,7 @@ export const DashboardFilters: React.FC = () => {
             <option value="mapa">Mapa</option>
             <option value="ia_en_riesgos">IA en Riesgos</option>
             <option value="proteccion_datos_personales">Protección Datos</option>
+            <option value="swg_summary">SWG Summary</option>
           </select>
         </div>
 

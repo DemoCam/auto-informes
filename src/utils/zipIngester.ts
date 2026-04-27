@@ -27,7 +27,7 @@ export async function ingestZip(
   if (!detection) {
     throw new Error(
       `No se pudo detectar la familia del ZIP: ${file.name}. ` +
-      `Esperados: IA_en_riesgos_*, Mapa_*, proteccin_* / protección_*`
+      `Esperados: IA_en_riesgos_*, Mapa_*, proteccin_* / protección_*, SWG_Summary_*`
     );
   }
 

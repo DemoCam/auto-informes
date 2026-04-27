@@ -17,6 +17,7 @@ const FAMILY_DASHBOARDS: Record<string, DashboardId[]> = {
   mapa: ['mapa_top_apps', 'mapa_private_access'],
   ia_en_riesgos: ['ia_risky_kpi', 'ia_risk_attributes', 'ia_distribution', 'ia_ccl_overview'],
   proteccion_datos_personales: ['proteccion_gdpr'],
+  swg_summary: ['swg_summary_main'],
 };
 
 function getDashboardsForFamily(family: string): DashboardId[] {

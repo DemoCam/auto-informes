@@ -16,6 +16,7 @@ import { IaRiskyAppsKpi } from '../components/dashboards/IaRiskyAppsKpi';
 import { IaRiskAttributes } from '../components/dashboards/IaRiskAttributes';
 import { IaDistribution } from '../components/dashboards/IaDistribution';
 import { IaCclOverview } from '../components/dashboards/IaCclOverview';
+import { SwgSummary } from '../components/dashboards/SwgSummary';
 import { FallbackMessage } from '../components/shared/FallbackMessage';
 import { DASHBOARD_DEFINITIONS } from '../utils/validator';
 import type { DashboardId, ResolvedDashboardData } from '../types';
@@ -25,12 +26,14 @@ const ORDERED_DASHBOARDS: DashboardId[] = [
   'mapa_top_apps', 'mapa_private_access',
   'proteccion_gdpr',
   'ia_risky_kpi', 'ia_risk_attributes', 'ia_distribution', 'ia_ccl_overview',
+  'swg_summary_main',
 ];
 
 const FAMILY_LABELS: Record<string, string> = {
   mapa: '🗺️ Mapa',
   ia_en_riesgos: '🤖 IA en Riesgos',
   proteccion_datos_personales: '🛡️ Protección Datos',
+  swg_summary: '🌐 SWG Summary',
 };
 
 export const ResultsPage: React.FC = () => {
@@ -41,7 +44,7 @@ export const ResultsPage: React.FC = () => {
 
   // Resolve data for ALL families — always compute all 3
   const resolvedByFamily = useMemo((): Record<string, ResolvedDashboardData> => {
-    const families = ['mapa', 'ia_en_riesgos', 'proteccion_datos_personales'] as const;
+    const families = ['mapa', 'ia_en_riesgos', 'proteccion_datos_personales', 'swg_summary'] as const;
     const result: Record<string, ResolvedDashboardData> = {};
     for (const f of families) {
       result[f] = getResolvedData(f);
@@ -142,6 +145,7 @@ export const ResultsPage: React.FC = () => {
                   {def.family === 'mapa' && '🗺️'}
                   {def.family === 'ia_en_riesgos' && '🤖'}
                   {def.family === 'proteccion_datos_personales' && '🛡️'}
+                  {def.family === 'swg_summary' && '🌐'}
                   {' '}{def.title}
                   <span style={{ fontSize: '0.7rem', fontWeight: 400, color: 'var(--text-muted)', marginLeft: 12 }}>
                     {familyCuts.length} corte{familyCuts.length !== 1 ? 's' : ''}
@@ -156,6 +160,7 @@ export const ResultsPage: React.FC = () => {
                 {dashId === 'ia_risk_attributes' && <IaRiskAttributes resolved={resolved} />}
                 {dashId === 'ia_distribution' && <IaDistribution resolved={resolved} />}
                 {dashId === 'ia_ccl_overview' && <IaCclOverview resolved={resolved} />}
+                {dashId === 'swg_summary_main' && <SwgSummary resolved={resolved} />}
               </div>
             );
           })}

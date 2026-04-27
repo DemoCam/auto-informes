@@ -256,3 +256,97 @@ export function mergeSankeyData(
     }),
   };
 }
+
+/**
+ * Merge top-N data grouped by MULTIPLE key columns (e.g. User + Application).
+ * Returns rows with composite keys and summed values.
+ * Used by SWG Summary YouTube consumption tables.
+ */
+export function mergeTopNMultiKey(
+  csvs: ParsedCsv[],
+  keyColumns: string[],
+  valueColumn: string,
+  limit?: number
+): Record<string, unknown>[] {
+  const accumulated: Record<string, { keys: Record<string, string>; total: number }> = {};
+
+  for (const csv of csvs) {
+    // Resolve actual column names via fuzzy match
+    const resolvedKeys = keyColumns.map((k) => findColumn(csv, k));
+    const resolvedVal = findColumn(csv, valueColumn);
+    if (resolvedKeys.some((k) => !k) || !resolvedVal) continue;
+
+    for (const row of csv.rows) {
+      const keyParts: string[] = [];
+      const keyValues: Record<string, string> = {};
+      let valid = true;
+
+      for (let i = 0; i < keyColumns.length; i++) {
+        const colName = resolvedKeys[i]!;
+        const val = String(row[colName] ?? '').trim();
+        if (!val) { valid = false; break; }
+        keyParts.push(val);
+        keyValues[keyColumns[i]] = val;
+      }
+      if (!valid) continue;
+
+      const compositeKey = keyParts.join('|||');
+      const numVal = getNumericValue(row[resolvedVal]);
+
+      if (!accumulated[compositeKey]) {
+        accumulated[compositeKey] = { keys: keyValues, total: 0 };
+      }
+      accumulated[compositeKey].total += numVal;
+    }
+  }
+
+  const sorted = Object.values(accumulated)
+    .sort((a, b) => b.total - a.total);
+
+  const limited = limit ? sorted.slice(0, limit) : sorted;
+
+  return limited.map((item, idx) => ({
+    _index: idx + 1,
+    ...item.keys,
+    _value: item.total,
+  }));
+}
+
+/**
+ * Merge categorical data, sum values, and compute percentages.
+ * Used by SWG Summary Top Blocked Categories.
+ * Returns categories sorted descending by events with computed percentages.
+ */
+export function mergeAndComputePercentages(
+  csvs: ParsedCsv[],
+  categoryColumn: string,
+  valueColumn: string
+): { name: string; value: number; percentage: number }[] {
+  const accumulated: Record<string, number> = {};
+
+  for (const csv of csvs) {
+    const colCat = findColumn(csv, categoryColumn);
+    const colVal = findColumn(csv, valueColumn);
+    if (!colCat || !colVal) continue;
+
+    for (const row of csv.rows) {
+      let cat = String(row[colCat] ?? '').trim();
+      // Normalize empty/null categories to "n/a"
+      if (!cat || cat.toLowerCase() === 'null' || cat.toLowerCase() === 'nan') {
+        cat = 'n/a';
+      }
+      const val = getNumericValue(row[colVal]);
+      accumulated[cat] = (accumulated[cat] || 0) + val;
+    }
+  }
+
+  const total = Object.values(accumulated).reduce((s, v) => s + v, 0);
+
+  return Object.entries(accumulated)
+    .map(([name, value]) => ({
+      name,
+      value,
+      percentage: total > 0 ? (value / total) * 100 : 0,
+    }))
+    .sort((a, b) => b.value - a.value);
+}

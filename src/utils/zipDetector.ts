@@ -48,6 +48,15 @@ export function detectZipFamily(filename: string): DetectionResult | null {
     };
   }
 
+  // SWG Summary
+  if (lower.startsWith('swg_summary_')) {
+    return {
+      sourceType: 'swg_summary',
+      expectedFolder: 'dashboard-swg_summary/',
+      expectedCsvCount: 5,
+    };
+  }
+
   return null;
 }
 

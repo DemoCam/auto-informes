@@ -54,3 +54,14 @@ export const KPI_COLORS: Record<string, string> = {
   sessions: '#212121',
   dataCenters: '#212121',
 };
+
+/** SWG Summary — Top Blocked Categories colors by category name */
+export const SWG_BLOCKED_CATEGORY_COLORS: Record<string, string> = {
+  'Cat_All': '#00BCD4',
+  'Chat, IM & other communication': '#E91E8C',
+  'Social': '#8BC34A',
+  'Streaming & Downloadable Video': '#9C27B0',
+  'Cat_Riesgo_Seguridad': '#2196F3',
+  'n/a': '#4CAF50',
+  'Cat_Navegacion': '#FFC107',
+};

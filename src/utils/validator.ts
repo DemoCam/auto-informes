@@ -123,6 +123,27 @@ export const DASHBOARD_DEFINITIONS: Record<DashboardId, DashboardMeta & { requir
       'ai_apps_used_by_ccl_score.csv': ['Application', 'CCI'],
     },
   },
+
+  // ─── SWG Summary ───
+  swg_summary_main: {
+    id: 'swg_summary_main',
+    title: 'SWG Summary',
+    family: 'swg_summary',
+    requiredFiles: [
+      'youtube_consumption_on-premise.csv',
+      'youtube_consumption_off-premise.csv',
+      'top_blocked_categories.csv',
+      'malware_summary.csv',
+      'summary_of_total_youtube_consumption.csv',
+    ],
+    requiredColumns: {
+      'youtube_consumption_on-premise.csv': ['User', 'Application', 'Sum - Total Bytes (MB)'],
+      'youtube_consumption_off-premise.csv': ['User', 'Application', 'Sum - Total Bytes (MB)'],
+      'top_blocked_categories.csv': ['Category', '# Blocked Events'],
+      'malware_summary.csv': ['User', 'Site', 'URL', 'Policy Name', 'Action', 'Event Date'],
+      'summary_of_total_youtube_consumption.csv': ['User', 'Application', 'Sum - Total Bytes (MB)'],
+    },
+  },
 };
 
 /**

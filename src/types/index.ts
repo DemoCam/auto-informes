@@ -1,7 +1,7 @@
 // ─── ZIP Entity: the main model for each uploaded ZIP ───
 export interface ZipEntity {
   id: string;
-  sourceType: 'mapa' | 'ia_en_riesgos' | 'proteccion_datos_personales';
+  sourceType: 'mapa' | 'ia_en_riesgos' | 'proteccion_datos_personales' | 'swg_summary';
   originalFileName: string;
   cutDate: string;            // ISO date string YYYY-MM-DD
   reportingMonth: string;     // YYYY-MM
@@ -41,7 +41,8 @@ export type DashboardId =
   | 'ia_risky_kpi'
   | 'ia_risk_attributes'
   | 'ia_distribution'
-  | 'ia_ccl_overview';
+  | 'ia_ccl_overview'
+  | 'swg_summary_main';
 
 export interface DashboardMeta {
   id: DashboardId;
